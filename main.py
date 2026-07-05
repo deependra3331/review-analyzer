@@ -23,11 +23,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.mount("/static", StaticFiles(directory="../frontend"), name="static")
+app.mount("/static", StaticFiles(directory="frontend"), name="static")
 
 @app.get("/dashboard")
 def get_dashboard():
-    return FileResponse("../frontend/index.html")
+    return FileResponse("frontend/index.html")
 
 @app.get("/")
 def read_root():
