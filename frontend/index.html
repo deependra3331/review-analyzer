@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spotify Review Analyzer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        spotify: '#1ed760',
+                        background: '#121212',
+                        surface: '#181818',
+                        surfaceHover: '#282828',
+                        textPrimary: '#FFFFFF',
+                        textSecondary: '#B3B3B3',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .glass {
+            background-color: #181818;
+            border: none;
+            transition: background-color 0.2s ease;
+        }
+        .glass:hover {
+            background-color: #282828;
+        }
+        .pattern-dots { background-image: radial-gradient(#1ed760 1px, transparent 1px); background-size: 8px 8px; }
+        .pattern-lines { background-image: repeating-linear-gradient(45deg, #1ed760, #1ed760 1px, transparent 1px, transparent 8px); }
+        .pattern-cross { background-image: radial-gradient(circle, transparent 20%, #181818 20%, #181818 80%, transparent 80%, transparent), radial-gradient(circle, transparent 20%, #181818 20%, #181818 80%, transparent 80%, transparent) 4px 4px, linear-gradient(#1ed760 2px, transparent 2px) 0 -1px, linear-gradient(90deg, #1ed760 2px, #181818 2px) -1px 0; background-size: 8px 8px, 8px 8px, 4px 4px, 4px 4px; }
+        
+        /* Micro-animations */
+        .hover-lift { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+        .hover-lift:hover { transform: translateY(-4px); box-shadow: 0 10px 20px rgba(0,0,0,0.4); }
+    </style>
+</head>
+<body class="bg-background text-textPrimary min-h-screen">
+
+    <nav class="bg-black sticky top-0 z-50 px-6 py-4 flex justify-between items-center shadow-lg">
+        <div class="flex items-center space-x-3">
+            <svg role="img" viewBox="0 0 24 24" class="w-8 h-8 text-spotify" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><title>Spotify</title><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.24 1.021zM18.6 14.1c-.3.42-.84.54-1.26.3-3.24-1.98-8.16-2.58-11.94-1.44-.48.12-1.02-.12-1.14-.6-.12-.48.12-1.02.6-1.14 4.32-1.26 9.72-.6 13.44 1.68.42.18.54.78.3 1.2zM18.84 10.56c-3.96-2.34-10.44-2.58-14.22-1.44-.6.18-1.2-.18-1.38-.78-.18-.6.18-1.2.78-1.38 4.32-1.26 11.52-1.02 16.14 1.68.54.3.72 1.02.42 1.56-.3.6-.96.72-1.74.36z"/></svg>
+            <h1 class="text-xl font-bold tracking-tight">Spotify Review Analyzer</h1>
+        </div>
+        <div class="flex items-center space-x-4">
+            <span id="statusIndicator" class="text-sm text-textSecondary flex items-center">
+                <span class="w-2 h-2 rounded-full bg-green-500 mr-2 animate-pulse"></span> Ready
+            </span>
+            <button id="runBtn" class="bg-textPrimary text-black px-4 py-2 rounded-full font-semibold text-sm hover:scale-105 transition-transform duration-200 shadow-md">
+                Run Analysis Pipeline
+            </button>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-6 py-8">
+        
+        <!-- Global Insights Section -->
+        <section id="globalInsights" class="hidden mb-8">
+            <h2 class="text-2xl font-bold mb-4">Executive Summary</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="globalInsightsGrid">
+                <!-- Cards will be injected here -->
+            </div>
+        </section>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <!-- Left Column: Themes -->
+            <div class="lg:col-span-2 space-y-6">
+                <div class="flex justify-between items-end mb-4">
+                    <h2 class="text-2xl font-bold">Emerging Themes</h2>
+                    <select id="runSelect" class="bg-surface border border-gray-700 text-sm rounded-md px-3 py-1.5 outline-none focus:border-spotify">
+                        <option value="latest">Latest Run</option>
+                    </select>
+                </div>
+                
+                <div id="themesList" class="space-y-4">
+                    <!-- Themes will be injected here -->
+                    <div class="text-textSecondary animate-pulse">Loading themes...</div>
+                </div>
+            </div>
+
+            <!-- Right Column: Insights -->
+            <div class="space-y-8">
+                <section>
+                    <h3 class="text-lg font-semibold mb-4 text-textSecondary uppercase tracking-wider text-sm">Key Unmet Needs</h3>
+                    <div id="needsList" class="glass rounded-xl p-5 space-y-3">
+                        <!-- Needs injected here -->
+                    </div>
+                </section>
+
+                <section>
+                    <h3 class="text-lg font-semibold mb-4 text-textSecondary uppercase tracking-wider text-sm">Jobs-To-Be-Done</h3>
+                    <div id="jtbdList" class="space-y-3">
+                        <!-- JTBD injected here -->
+                    </div>
+                </section>
+                
+                <section>
+                    <h3 class="text-lg font-semibold mb-4 text-textSecondary uppercase tracking-wider text-sm">Segment Breakdown</h3>
+                    <div id="segmentList" class="glass rounded-xl p-5 space-y-4">
+                        <!-- Segments injected here -->
+                    </div>
+                </section>
+            </div>
+            
+        </div>
+    </main>
+
+    <!-- Drawer Overlay -->
+    <div id="drawerOverlay" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden opacity-0 transition-opacity duration-300"></div>
+    
+    <!-- Drawer -->
+    <div id="evidenceDrawer" class="fixed right-0 top-0 bottom-0 w-full max-w-md bg-surface z-50 transform translate-x-full transition-transform duration-300 shadow-2xl flex flex-col">
+        <div class="p-6 border-b border-gray-800 flex justify-between items-center">
+            <h3 class="text-xl font-bold" id="drawerTitle">Evidence</h3>
+            <button id="closeDrawerBtn" class="text-gray-400 hover:text-white">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+        </div>
+        <div class="p-6 overflow-y-auto flex-1 space-y-4" id="drawerContent">
+            <!-- Evidence injected here -->
+        </div>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>
